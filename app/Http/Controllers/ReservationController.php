@@ -27,10 +27,12 @@ class ReservationController extends Controller
      */
     public function create()
     {
-        $id = Auth::user()->id;
-        DB::table('reservations')->insert([
-            ['user_id' => "$id", 'state' => 'booked']
-        ]);
+        DB::transaction(function () {
+            $id = Auth::user()->id;
+            DB::table('reservations')->insert([
+                ['user_id' => "$id", 'state' => 'booked']
+            ]);
+        });
     }
 
     /**

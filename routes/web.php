@@ -20,3 +20,4 @@ Auth::routes();
 Route::get('/home', 'HomeController@index')->name('home');
 Route::get('/create', 'ReservationController@create');
 Route::get('/show', 'ReservationController@show');
+Route::get('/update', 'ReservationController@update');

@@ -18,6 +18,8 @@ class Reservations extends Migration
             $table->bigInteger('user_id');
             $table->string('state');
             $table->timestamp('schedule')->useCurrent();
+            $table->timestamp('created_at');
+            $table->timestamp('updated_at');
         });
     }
 

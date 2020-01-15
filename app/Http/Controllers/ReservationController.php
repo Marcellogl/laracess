@@ -29,11 +29,27 @@ class ReservationController extends Controller
     {
         DB::transaction(function () {
             $id = Auth::user()->id;
-            DB::table('reservations')->insert([
-                ['user_id' => "$id", 'state' => 'booked']
-            ]);
+            $reservations = DB::table('reservations')
+            ->where('user_id','=',"$id")->get();
+            if ($reservations->isEmpty()){
+                $reservation = new Reservation;
+                $reservation->user_id = $id;
+                $reservation->state = 'booked';
+                $reservation->save();
+            }else{
+                foreach ($reservations as $reservation) {
+                    echo$reservation->state;
+                    if($reservation->state != 'booked' && $reservation->state != 'in progress' ){
+                        $reservation = new Reservation;
+                        $reservation->user_id = $id;
+                        $reservation->state = 'booked';
+                        $reservation->save();
+                    }
+            }
         });
     }
+
+    // risolvere problema doppio booked
 
     /**
      * Store a newly created resource in storage.
@@ -56,8 +72,6 @@ class ReservationController extends Controller
     {
         // crea elenco prenotazioni da inviare
         $reservations = Reservation::all();
-
-
         return view('welcome', compact('reservations'));
     }
 
@@ -79,9 +93,20 @@ class ReservationController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+
+    public function update()
     {
-        //
+        $id = Auth::user()->id;
+        DB::table('reservations')
+            ->where('user_id', $id)
+            ->update(['state' => 'complete']);
+
+        $reservation = DB::table('reservations')->where('state','=', 'booked')->get()->first();
+        if ($reservation){
+            DB::table('reservations')
+            ->where('id',$reservation->id)
+            ->update(['state' => 'in progress']);
+        }
     }
 
     /**

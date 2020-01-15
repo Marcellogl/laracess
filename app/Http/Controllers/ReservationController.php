@@ -52,7 +52,7 @@ class ReservationController extends Controller
      */
     public function show()
     {
-        // crea elenco prenotazioni da inviare !
+        // crea elenco prenotazioni da inviare
         $reservations = Reservation::all();
 
 

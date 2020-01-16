@@ -30,26 +30,16 @@ class ReservationController extends Controller
         DB::transaction(function () {
             $id = Auth::user()->id;
             $reservations = DB::table('reservations')
-            ->where('user_id','=',"$id")->get();
+            ->where('user_id','=',"$id")->where('state','=','booked')->get();
             if ($reservations->isEmpty()){
                 $reservation = new Reservation;
                 $reservation->user_id = $id;
                 $reservation->state = 'booked';
                 $reservation->save();
-            }else{
-                foreach ($reservations as $reservation) {
-                    echo$reservation->state;
-                    if($reservation->state != 'booked' && $reservation->state != 'in progress' ){
-                        $reservation = new Reservation;
-                        $reservation->user_id = $id;
-                        $reservation->state = 'booked';
-                        $reservation->save();
-                    }
-            }
+            } 
         });
+        return redirect('/list');
     }
-
-    // risolvere problema doppio booked
 
     /**
      * Store a newly created resource in storage.
@@ -72,7 +62,7 @@ class ReservationController extends Controller
     {
         // crea elenco prenotazioni da inviare
         $reservations = Reservation::all();
-        return view('welcome', compact('reservations'));
+        return view('list', compact('reservations'));
     }
 
     /**
@@ -102,11 +92,8 @@ class ReservationController extends Controller
             ->update(['state' => 'complete']);
 
         $reservation = DB::table('reservations')->where('state','=', 'booked')->get()->first();
-        if ($reservation){
-            DB::table('reservations')
-            ->where('id',$reservation->id)
-            ->update(['state' => 'in progress']);
-        }
+        dd($reservation);
+        // invia notifica a $reservation->user_id;
     }
 
     /**
